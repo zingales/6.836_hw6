@@ -7,7 +7,7 @@ public class LamportQueue<T> {
   
   
   
-  public LamportQueue(int capacity, Lock lock) {
+  public LamportQueue(int capacity) {
     items = (T[]) new Object[capacity];
     head = 0; tail =0;
   }

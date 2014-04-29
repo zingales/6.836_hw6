@@ -1,5 +1,41 @@
 import java.util.ArrayList;
 
+class SerialDispatcher implements Runnable {
+
+	PaddedPrimitiveNonVolatile<Boolean> done;
+	final PacketGenerator pkt;
+	final Fingerprint residue = new Fingerprint();
+	long fingerprint = 0;
+	long totalPackets = 0;
+	final int numSources = 1;
+	ArrayList<LamportQueue<Packet>> qArray;
+
+	public SerialDispatcher(PaddedPrimitiveNonVolatile<Boolean> done, PacketGenerator pkt, ArrayList<LamportQueue<Packet>> qArray) {
+
+		this.done = done;
+		this.pkt = pkt;
+		this.qArray = qArray;
+	}
+
+	public void run() {
+		Packet tmp;
+		// guaranteed to be zero
+		// int[] dispatched = new int[numSources];
+		tmp = pkt.getPacket();
+		while (!done.value) {
+			try {
+				// enqueue tmp in the ith Lamport queue
+				qArray.get(0).enq(tmp);
+				tmp = pkt.getPacket();
+				// dispatched[i]++;
+
+			} catch (FullException e) {
+				;
+			}
+		}
+	}
+}
+
 class Dispatcher implements Runnable {
 
 	PaddedPrimitiveNonVolatile<Boolean> done;
