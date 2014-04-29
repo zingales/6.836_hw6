@@ -25,7 +25,7 @@ class SerialFirewall {
 		Thread dispatcherThread = new Thread(dispatcher);
 		dispatcherThread.start();
 		
-		PipelineIntro workerData = new PipelineIntro(done, q);
+		SerialPipeline workerData = new SerialPipeline(done, q);
 		Thread workerThread = new Thread(workerData);
 		
 		workerThread.start();
