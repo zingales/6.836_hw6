@@ -58,6 +58,9 @@ class SerialPipeline implements Runnable {
 			} else {
 				png.remove(pkt.config.address);
 			}
+			if(!r.containsKey(pkt.config.address)) {
+				r.put(pkt.config.address, new IntervalList());
+			}
 			if( pkt.config.acceptingRange) {
 				// valid ranges
 				r.get(pkt.config.address).add(pkt.config.addressBegin, pkt.config.addressEnd);
