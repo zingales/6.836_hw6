@@ -33,7 +33,7 @@ class Dispatcher implements Runnable {
 			} catch (FullException e) {
 				;
 			}
-			i = i+1 % qArray.size();
+			i = (i+1) % qArray.size();
 		}
 	}
 }
