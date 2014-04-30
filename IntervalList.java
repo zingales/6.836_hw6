@@ -65,15 +65,57 @@ public class IntervalList {
 		}
 	}
 
-	public void remove(int addressBegin, int addressEnd) {
-		removeContained(addressBegin, addressEnd);
+	public void remove(int start, int end) {
+		Entry<Integer, Node> e = list.floorEntry(start);
+		if (e!=null) {
+			Node og = e.getValue();
+			if (og.start < start && og.end > end) {
+				// we have need to spilt the current node.
+				og.end = start;
+				Node n = new Node(end, og.end);
+				list.put(n.start, n);
+				return;
+			}
+		}
+		removeContained(start, end);
+		removeTail(start, end);
+		removeHead(start, end);
+		
 		
 	}	
 	
+	private void removeHead(int start, int end) {
+		Entry<Integer, Node> e = list.ceilingEntry(start);
+		if (e != null) {
+			Node n = e.getValue();
+			if ( n.start < end) {
+				list.remove(n.start);
+				list.put(end, new Node(end, n.end));
+			}
+		}
+		
+	}
+
+	private void removeTail(int start, int end) {
+		Entry<Integer, Node> e = list.floorEntry(start);
+		if (e != null) {
+			Node n = e.getValue();
+			if (n.end > start) {
+				n.end = start;
+			}
+		}
+		
+	}
+	
+
 	private void removeContained(int start, int end) {
 		Entry<Integer, Node> e = list.ceilingEntry(start);
-		if( e!= null) {
+		if( e != null) {
 			Node n = e.getValue();
+			if(n.start >= start && n.end <= end) {
+				list.remove(n.start);
+				removeContained(start, end);
+			}
 		}
 	}
 
