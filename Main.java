@@ -5,9 +5,9 @@ class SerialFirewall {
 
 	
 	static final int numMilliseconds = 2000;
-	static final int numSources = 1;
+//	static final int numSources = 1;
 
-	public static long[] run(int numAddressesLog, int numTrainsLog, double meanTrainSize, double meanTrainsPerComm, int meanWindow, int meanCommsPerAddress, int meanWork, double configFraction, double pngFraction, double acceptingFraction) {
+	public static long[] run(int numSources, int numAddressesLog, int numTrainsLog, double meanTrainSize, double meanTrainsPerComm, int meanWindow, int meanCommsPerAddress, int meanWork, double configFraction, double pngFraction, double acceptingFraction) {
 
 		@SuppressWarnings({ "unchecked" })
 		StopWatch timer = new StopWatch();
@@ -61,6 +61,7 @@ class SerialFirewall {
 
 	public static void main(String[] args) {
 
+		final int numSources = Integer.parseInt(args[0]);
 		final int numAddressesLog = 11;
 		final int numTrainsLog = 12;
 		final double meanTrainSize = 5.0;
@@ -75,7 +76,7 @@ class SerialFirewall {
 		
 		double throughput = 0;
 		for (int i = 0; i < iters; i++) {
-			long[] ans = SerialFirewall.run(numAddressesLog, numTrainsLog, meanTrainSize, meanTrainsPerComm, meanWindow, meanCommsPerAddress, meanWork, configFraction, pngFraction, acceptingFraction);
+			long[] ans = SerialFirewall.run(numSources, numAddressesLog, numTrainsLog, meanTrainSize, meanTrainsPerComm, meanWindow, meanCommsPerAddress, meanWork, configFraction, pngFraction, acceptingFraction);
 			throughput += (double) ans[0] / (double) ans[1];
 		}
 
