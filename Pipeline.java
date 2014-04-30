@@ -7,7 +7,7 @@ class SerialPipeline implements Runnable {
 	PaddedPrimitiveNonVolatile<Boolean> done;
 	LamportQueue<Packet> q;
 	Fingerprint fprint;
-	int totalPackets;
+	int totalPackets, dataPackets;
 	HashSet<Integer> png;
 	HashMap<Integer, IntervalList> r;
 	Histogram hist;
@@ -15,6 +15,7 @@ class SerialPipeline implements Runnable {
 		this.done = done;
 		this.q = q;
 		this.totalPackets = 0;
+		this.dataPackets =0;
 		this.fprint = new Fingerprint();
 		png = new HashSet<Integer>();
 		r = new HashMap<Integer, IntervalList>();
@@ -36,14 +37,18 @@ class SerialPipeline implements Runnable {
 		
 	}
 	
-	private void process(Packet pkt) {
+	public void process(Packet pkt) {
+		totalPackets++;
 		if (pkt.type == Packet.MessageType.DataPacket) {
+//			System.out.println("data packet");
 			// ignore all packets from 
 			if (png.contains(pkt.header.source)) {
 				return;
 			}
+//			System.out.println("Not png'ed");
 			if(!r.containsKey(pkt.header.dest)) {
-				r.put(pkt.header.dest, new IntervalList());
+				return;
+//				r.put(pkt.header.dest, new IntervalList());
 			}
 			if (!r.get(pkt.header.dest).valid(pkt.header.source)) {
 				return;
@@ -51,7 +56,7 @@ class SerialPipeline implements Runnable {
 			// add to histogram
 			long fingerprint = fprint.getFingerprint(pkt.body.iterations, pkt.body.seed);
 			hist.add(fingerprint);
-			totalPackets++;
+			dataPackets++;
 		} else if (pkt.type == Packet.MessageType.ConfigPacket) {
 			if( pkt.config.personaNonGrata ) {
 				png.add(pkt.config.address);

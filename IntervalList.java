@@ -5,8 +5,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
 
 
 public class IntervalList {
-	private final static  boolean BEGIN = true;
-	private final static boolean END = false;
 	ConcurrentSkipListMap<Integer, Node> list;
 	public IntervalList() {
 		list = new ConcurrentSkipListMap<Integer, Node>();

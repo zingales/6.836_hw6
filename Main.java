@@ -24,8 +24,12 @@ class SerialFirewall {
 		SerialDispatcher dispatcher = new SerialDispatcher(dispatcherDone, pkt, list);
 		Thread dispatcherThread = new Thread(dispatcher);
 		dispatcherThread.start();
+		double preConfig = Math.pow(1<< numAddressesLog, 1.5);
 		
 		SerialPipeline workerData = new SerialPipeline(done, q);
+		for (int i =0; i < preConfig; i++) {
+			workerData.process(pkt.getConfigPacket());
+		}
 		Thread workerThread = new Thread(workerData);
 		
 		workerThread.start();
@@ -51,7 +55,7 @@ class SerialFirewall {
 			;
 		}
 		timer.stopTimer();
-		final long totalCount = workerData.totalPackets;
+		final long totalCount = workerData.dataPackets;
 		return new long[] { totalCount, timer.getElapsedTime() };
 	}
 
