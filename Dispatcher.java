@@ -20,15 +20,12 @@ class Dispatcher implements Runnable {
 	public void run() {
 		Packet tmp;
 		// guaranteed to be zero
-		// int[] dispatched = new int[numSources];
 		tmp = pkt.getPacket();
 		int i = 0;
 		while (!done.value) {
 			try {
-				// enqueue tmp in the ith Lamport queue
 				qArray.get(i).enq(tmp);
 				tmp = pkt.getPacket();
-				// dispatched[i]++;
 
 			} catch (FullException e) {
 				;
