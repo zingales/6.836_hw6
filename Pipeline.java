@@ -258,12 +258,19 @@ class FingerPrinter implements Runnable {
 	public void run() {
 //		System.out.println("Starting Fingerprinter");
 		Packet pkt = null;
-		while(true) {
+		while(!done.value) {
 			pkt = q.deq();
 			if (pkt == null) continue;
 			long fingerprint = fprint.getFingerprint(pkt.body.iterations, pkt.body.seed);
 			hist.add(fingerprint);
 		}
+		while(true) {
+			pkt = q.deq();
+			if (pkt == null) break;
+			long fingerprint = fprint.getFingerprint(pkt.body.iterations, pkt.body.seed);
+			hist.add(fingerprint);
+		}
+
 	}
 	
 }
