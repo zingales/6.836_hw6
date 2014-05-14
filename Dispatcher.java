@@ -23,11 +23,8 @@ class Dispatcher implements Runnable {
 		tmp = pkt.getPacket();
 		int i = 0;
 		while (!done.value) {
-			try {
-				qArray.get(i).enq(tmp);
+			if(qArray.get(i).enq(tmp)) {
 				tmp = pkt.getPacket();
-			} catch (FullException e) {
-				;
 			}
 			i = (i+1) % qArray.size();
 		}

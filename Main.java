@@ -191,7 +191,7 @@ class ParallelFirewall {
 		StopWatch timer = new StopWatch();
 		
 		PacketGenerator pkt = new PacketGenerator(numAddressesLog, numTrainsLog, meanTrainSize, meanTrainsPerComm, meanWindow, meanCommsPerAddress, meanWork, configFraction, pngFraction, acceptingFraction);
-		pkt.numConfigPackets = pkt.addressMask
+		pkt.numConfigPackets = pkt.addressesMask;
 		PaddedPrimitiveNonVolatile<Boolean> done = new PaddedPrimitiveNonVolatile<Boolean>(false);
 		PaddedPrimitiveNonVolatile<Boolean> dispatcherDone = new PaddedPrimitiveNonVolatile<Boolean>(false);
 		PaddedPrimitive<Boolean> memFence = new PaddedPrimitive<Boolean>(false);
@@ -207,18 +207,13 @@ class ParallelFirewall {
 		
 		Dispatcher dispatcher = new Dispatcher(dispatcherDone, pkt, list);
 		Thread dispatcherThread = new Thread(dispatcher);
-		dispatcherThread.start();
 		preconfig(numAddressesLog,workerData[0], pkt);
-//		double preConfig = Math.pow(1<< numAddressesLog, 1.5);
-//		
-//		for (int i =0; i < preConfig; i++) {
-//			workerData[0].process(pkt.getConfigPacket());
-//		}
 		
 		for(int i = 0; i < numSources; i++) {
 			workerThread[i].start();
 		}
 		timer.startTimer();
+		dispatcherThread.start();
 		try {
 			Thread.sleep(numMilliseconds);
 		} catch (InterruptedException ignore) {
@@ -239,7 +234,7 @@ class ParallelFirewall {
 			try { // which means that done.value is visible to the workers
 				workerThread[i].join();
 			} catch (InterruptedException ignore) {;}
-			totalCount += workerData[i].dataPackets;
+			totalCount += workerData[i].totalPackets;
 			
 		}
 		timer.stopTimer();

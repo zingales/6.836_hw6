@@ -12,17 +12,18 @@ public class LamportQueue<T> {
     head = 0; tail =0;
   }
   
-  public void enq(T x) throws FullException{
+  public boolean enq(T x){
     if (tail - head == items.length) {
-      throw new FullException();
+      return false;
     }
     items[tail % items.length]= x;
     tail++;
+    return true;
   }
   
-  public T deq() throws EmptyException{
+  public T deq(){
     if (tail - head ==0) {
-      throw new EmptyException();
+    	return null;
     }
     T x = items[head % items.length];
     head++;
