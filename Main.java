@@ -191,6 +191,7 @@ class ParallelFirewall {
 		StopWatch timer = new StopWatch();
 		
 		PacketGenerator pkt = new PacketGenerator(numAddressesLog, numTrainsLog, meanTrainSize, meanTrainsPerComm, meanWindow, meanCommsPerAddress, meanWork, configFraction, pngFraction, acceptingFraction);
+		pkt.numConfigPackets = pkt.addressMask
 		PaddedPrimitiveNonVolatile<Boolean> done = new PaddedPrimitiveNonVolatile<Boolean>(false);
 		PaddedPrimitiveNonVolatile<Boolean> dispatcherDone = new PaddedPrimitiveNonVolatile<Boolean>(false);
 		PaddedPrimitive<Boolean> memFence = new PaddedPrimitive<Boolean>(false);
