@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 class SerialFirewall {
@@ -183,9 +186,9 @@ class ParallelFirewall {
 
 	
 	static final int numMilliseconds = 2000;
-	static final int numSources = 2;
+//	static final int numSources = 2;
 
-	public static long[] run(int numAddressesLog, int numTrainsLog, double meanTrainSize, double meanTrainsPerComm, int meanWindow, int meanCommsPerAddress, int meanWork, double configFraction, double pngFraction, double acceptingFraction) {
+	public static long[] run(int numSources, int numAddressesLog, int numTrainsLog, double meanTrainSize, double meanTrainsPerComm, int meanWindow, int meanCommsPerAddress, int meanWork, double configFraction, double pngFraction, double acceptingFraction) {
 
 		@SuppressWarnings({ "unchecked" })
 		StopWatch timer = new StopWatch();
@@ -199,9 +202,19 @@ class ParallelFirewall {
 		ArrayList<LamportQueue<Packet>> list = new ArrayList<LamportQueue<Packet>>();
 		ParallelPipeline[] workerData = new ParallelPipeline[numSources];
 		Thread[] workerThread = new Thread[numSources];
+//		create PNG
+		Set<Integer> png = Collections.newSetFromMap(new ConcurrentHashMap<Integer, Boolean>());
+//		create histogram
+		ParallelHistogram hist = new ParallelHistogram();
+//		create addrs space
+		ParallelIntervalList[] r;
+		r = new ParallelIntervalList[1<<numAddressesLog];
+		for(int i=0; i< r.length; i++) {
+			r[i] = new ParallelIntervalList(numAddressesLog);
+		}
 		for(int i = 0; i < numSources; i++) {
 			list.add(new LamportQueue<Packet>(256/numSources));
-			workerData[i] = new ParallelPipeline(numAddressesLog, done, list.get(i));
+			workerData[i] = new ParallelPipeline(png, r, hist, numAddressesLog, done, list.get(i));
 			workerThread[i] = new Thread(workerData[i]);
 		}
 		
@@ -243,6 +256,9 @@ class ParallelFirewall {
 
 	public static void main(String[] args) {
 
+		final int numSources = Integer.parseInt(args[0]);
+
+		
 //		exp1
 		final int numAddressesLog = 11;
 		final int numTrainsLog = 12;
@@ -271,7 +287,7 @@ class ParallelFirewall {
 		
 		double throughput = 0;
 		for (int i = 0; i < iters; i++) {
-			long[] ans = ParallelFirewall.run(numAddressesLog, numTrainsLog, meanTrainSize, meanTrainsPerComm, meanWindow, meanCommsPerAddress, meanWork, configFraction, pngFraction, acceptingFraction);
+			long[] ans = ParallelFirewall.run(numSources, numAddressesLog, numTrainsLog, meanTrainSize, meanTrainsPerComm, meanWindow, meanCommsPerAddress, meanWork, configFraction, pngFraction, acceptingFraction);
 			throughput += (double) ans[0] / (double) ans[1];
 		}
 

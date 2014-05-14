@@ -173,19 +173,20 @@ class ParallelPipeline implements Runnable {
 	Fingerprint fprint;
 	int totalPackets, dataPackets;
 	Set<Integer> png;
-	Map<Integer, ParallelIntervalList> r;
+//	Map<Integer, ParallelIntervalList> r;
+	ParallelIntervalList[] r;
 	ParallelHistogram hist;
 	int addrLog;
-	public ParallelPipeline(int numAddressesLog, PaddedPrimitiveNonVolatile<Boolean> done , LamportQueue<Packet> q) {
+	public ParallelPipeline(Set<Integer> png, ParallelIntervalList[] r, ParallelHistogram hist, int numAddressesLog, PaddedPrimitiveNonVolatile<Boolean> done , LamportQueue<Packet> q) {
 		this.done = done;
 		this.q = q;
 		this.totalPackets = 0;
 		this.dataPackets =0;
 		this.fprint = new Fingerprint();
-		png = Collections.newSetFromMap(new ConcurrentHashMap<Integer, Boolean>());
-		r = new ConcurrentHashMap<Integer, ParallelIntervalList>();
-		hist = new ParallelHistogram();
-		addrLog = numAddressesLog;
+//		r = new ConcurrentHashMap<Integer, ParallelIntervalList>();
+		this.r = r;
+		this.hist = hist; 
+		this.png = png;
 	}
 
 	public void run() {
@@ -207,10 +208,7 @@ class ParallelPipeline implements Runnable {
 			if (png.contains(pkt.header.source)) {
 				return;
 			}
-			if(!r.containsKey(pkt.header.dest)) {
-				return;
-			}
-			if (!r.get(pkt.header.dest).valid(pkt.header.source)) {
+			if (!r[pkt.header.dest].valid(pkt.header.source)) {
 				return;
 			}
 			// add to histogram
@@ -220,15 +218,15 @@ class ParallelPipeline implements Runnable {
 		} else if (pkt.type == Packet.MessageType.ConfigPacket) {
 			updatePNG(pkt.config.personaNonGrata, pkt.config.address);
 		
-			if(!r.containsKey(pkt.config.address)) {
-				r.put(pkt.config.address, new ParallelIntervalList(addrLog));
-			}
+//			if(!r.containsKey(pkt.config.address)) {
+//				r.put(pkt.config.address, new ParallelIntervalList(addrLog));
+//			}
 			if( pkt.config.acceptingRange) {
 				// valid ranges
-				r.get(pkt.config.address).add(pkt.config.addressBegin, pkt.config.addressEnd);
+				r[pkt.config.address].add(pkt.config.addressBegin, pkt.config.addressEnd);
 			} else {
 				// invalid ranges
-				r.get(pkt.config.address).remove(pkt.config.addressBegin, pkt.config.addressEnd);
+				r[pkt.config.address].remove(pkt.config.addressBegin, pkt.config.addressEnd);
 
 			}
 		}

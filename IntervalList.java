@@ -252,9 +252,10 @@ class STMIntervalList {
 
 class ParallelIntervalList {
 	
+	final static long min = Long.MAX_VALUE | Long.MIN_VALUE;
 	long[] addrs;
 	public ParallelIntervalList(int numAddressLog) {
-		addrs = new long[1<<numAddressLog];
+		addrs = new long[((1<<numAddressLog)/64) +1];
 	}
 	
 	public boolean valid(int source) {
@@ -274,7 +275,7 @@ class ParallelIntervalList {
 		addrs[start_index] |= bv;
 		for(int i = start_index+1; i < end_index; i++) {
 			// min because its all ones
-			addrs[i] = Long.MIN_VALUE;
+			addrs[i] = min;
 		}
 		addrs[end_index] |= ev;
 	}
