@@ -262,11 +262,11 @@ class ParallelIntervalList {
 		return ( (addrs[index] & (1<<source % 64))!=0);
 	}
 	
-	public void add(int begin, int end) {
+	public synchronized void add(int begin, int end) {
 		int start_index, end_index;
 		start_index = begin/64;
 		end_index = end/64;
-		int bv = -(1<<begin%64), ev = 2;
+		int bv = -(1<<(begin%64)), ev = (1<<(end%64))-1;
 		if (start_index == end_index) {
 			addrs[start_index] |= (bv*ev);
 			return;
@@ -279,11 +279,11 @@ class ParallelIntervalList {
 		addrs[end_index] |= ev;
 	}
 	
-	public void remove(int begin, int end){
+	public synchronized void remove(int begin, int end){
 		int start_index, end_index;
 		start_index = begin/64;
 		end_index = end/64;
-		int bv = (1<<begin%64)-1, ev = -(1<<end&64);
+		int bv = (1<<(begin%64))-1, ev = -(1<<(end&64));
 		if(start_index == end_index) {
 			addrs[start_index] &= (bv | ev);
 			return;
