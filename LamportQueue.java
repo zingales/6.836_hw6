@@ -2,7 +2,7 @@ import java.util.concurrent.locks.Lock;
 
 //single reader, single writer, wait-free queue
 public class LamportQueue<T> {
-  int head =0, tail = 0;
+  volatile int head =0, tail = 0;
   T[] items;
   
   

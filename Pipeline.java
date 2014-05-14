@@ -169,21 +169,21 @@ class STMPipeline implements Runnable {
 class ParallelPipeline implements Runnable {
 
 	PaddedPrimitiveNonVolatile<Boolean> done;
-	LamportQueue<Packet> q;
-	Fingerprint fprint;
+	LamportQueue<Packet> q, fq;
+//	Fingerprint fprint;
+	FingerPrinter fp;
 	int totalPackets, dataPackets;
 	Set<Integer> png;
 //	Map<Integer, ParallelIntervalList> r;
 	ParallelIntervalList[] r;
 	ParallelHistogram hist;
-	int addrLog;
 	public ParallelPipeline(Set<Integer> png, ParallelIntervalList[] r, ParallelHistogram hist, int numAddressesLog, PaddedPrimitiveNonVolatile<Boolean> done , LamportQueue<Packet> q) {
 		this.done = done;
 		this.q = q;
 		this.totalPackets = 0;
 		this.dataPackets =0;
-		this.fprint = new Fingerprint();
-//		r = new ConcurrentHashMap<Integer, ParallelIntervalList>();
+		this.fq = new LamportQueue<Packet>(100);
+		new Thread(new FingerPrinter(new Fingerprint(), fq, hist, done)).start();
 		this.r = r;
 		this.hist = hist; 
 		this.png = png;
@@ -212,8 +212,9 @@ class ParallelPipeline implements Runnable {
 				return;
 			}
 			// add to histogram
-			long fingerprint = fprint.getFingerprint(pkt.body.iterations, pkt.body.seed);
-			hist.add(fingerprint);
+			while(!fq.enq(pkt));
+//			long fingerprint = fprint.getFingerprint(pkt.body.iterations, pkt.body.seed);
+//			hist.add(fingerprint);
 			dataPackets++;
 		} else if (pkt.type == Packet.MessageType.ConfigPacket) {
 			updatePNG(pkt.config.personaNonGrata, pkt.config.address);
@@ -239,4 +240,30 @@ class ParallelPipeline implements Runnable {
 			png.remove(address);
 		}
 	}
+}
+
+class FingerPrinter implements Runnable {
+
+	ParallelHistogram hist;
+	LamportQueue<Packet> q;
+	PaddedPrimitiveNonVolatile<Boolean> done;
+	Fingerprint fprint;
+	public FingerPrinter(Fingerprint fprint, LamportQueue<Packet> q, ParallelHistogram hist, PaddedPrimitiveNonVolatile<Boolean> done) {
+		this.q = q;
+		this.hist = hist;
+		this.done = done;
+		this.fprint = fprint;
+	}
+
+	public void run() {
+//		System.out.println("Starting Fingerprinter");
+		Packet pkt = null;
+		while(true) {
+			pkt = q.deq();
+			if (pkt == null) continue;
+			long fingerprint = fprint.getFingerprint(pkt.body.iterations, pkt.body.seed);
+			hist.add(fingerprint);
+		}
+	}
+	
 }
