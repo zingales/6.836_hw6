@@ -26,7 +26,6 @@ class Dispatcher implements Runnable {
 			try {
 				qArray.get(i).enq(tmp);
 				tmp = pkt.getPacket();
-
 			} catch (FullException e) {
 				;
 			}
