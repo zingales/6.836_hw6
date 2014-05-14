@@ -175,7 +175,8 @@ class ParallelPipeline implements Runnable {
 	Set<Integer> png;
 	Map<Integer, ParallelIntervalList> r;
 	ParallelHistogram hist;
-	public ParallelPipeline( PaddedPrimitiveNonVolatile<Boolean> done , LamportQueue<Packet> q) {
+	int addrLog;
+	public ParallelPipeline(int numAddressesLog, PaddedPrimitiveNonVolatile<Boolean> done , LamportQueue<Packet> q) {
 		this.done = done;
 		this.q = q;
 		this.totalPackets = 0;
@@ -184,6 +185,7 @@ class ParallelPipeline implements Runnable {
 		png = Collections.newSetFromMap(new ConcurrentHashMap<Integer, Boolean>());
 		r = new ConcurrentHashMap<Integer, ParallelIntervalList>();
 		hist = new ParallelHistogram();
+		addrLog = numAddressesLog;
 	}
 
 	public void run() {
@@ -222,7 +224,7 @@ class ParallelPipeline implements Runnable {
 			updatePNG(pkt.config.personaNonGrata, pkt.config.address);
 		
 			if(!r.containsKey(pkt.config.address)) {
-				r.put(pkt.config.address, new ParallelIntervalList());
+				r.put(pkt.config.address, new ParallelIntervalList(addrLog));
 			}
 			if( pkt.config.acceptingRange) {
 				// valid ranges

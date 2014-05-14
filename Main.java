@@ -200,18 +200,19 @@ class ParallelFirewall {
 		Thread[] workerThread = new Thread[numSources];
 		for(int i = 0; i < numSources; i++) {
 			list.add(new LamportQueue<Packet>(256/numSources));
-			workerData[i] = new ParallelPipeline(done, list.get(i));
+			workerData[i] = new ParallelPipeline(numAddressesLog, done, list.get(i));
 			workerThread[i] = new Thread(workerData[i]);
 		}
 		
 		Dispatcher dispatcher = new Dispatcher(dispatcherDone, pkt, list);
 		Thread dispatcherThread = new Thread(dispatcher);
 		dispatcherThread.start();
-		double preConfig = Math.pow(1<< numAddressesLog, 1.5);
-		
-		for (int i =0; i < preConfig; i++) {
-			workerData[0].process(pkt.getConfigPacket());
-		}
+		preconfig(numAddressesLog,workerData[0], pkt);
+//		double preConfig = Math.pow(1<< numAddressesLog, 1.5);
+//		
+//		for (int i =0; i < preConfig; i++) {
+//			workerData[0].process(pkt.getConfigPacket());
+//		}
 		
 		for(int i = 0; i < numSources; i++) {
 			workerThread[i].start();
@@ -246,6 +247,7 @@ class ParallelFirewall {
 
 	public static void main(String[] args) {
 
+//		exp1
 		final int numAddressesLog = 11;
 		final int numTrainsLog = 12;
 		final double meanTrainSize = 5.0;
@@ -258,6 +260,19 @@ class ParallelFirewall {
 		final double acceptingFraction = 0.96;
 		final int iters = 1;
 		
+//		exp5
+//		final int numAddressesLog = 15;
+//		final int numTrainsLog = 14;
+//		final double meanTrainSize = 9.0;
+//		final double meanTrainsPerComm = 16.0;
+//		final int meanWindow = 7;
+//		final int meanCommsPerAddress = 10;
+//		final int meanWork = 4007;
+//		final double configFraction = 0.02;
+//		final double pngFraction = 0.10;
+//		final double acceptingFraction = 0.84;
+//		final int iters = 1;
+		
 		double throughput = 0;
 		for (int i = 0; i < iters; i++) {
 			long[] ans = ParallelFirewall.run(numAddressesLog, numTrainsLog, meanTrainSize, meanTrainsPerComm, meanWindow, meanCommsPerAddress, meanWork, configFraction, pngFraction, acceptingFraction);
@@ -266,6 +281,16 @@ class ParallelFirewall {
 
 		System.out.println("\tthroughput: " + throughput / iters);
 
+	}
+	
+//	mostly useful in profiling. 
+	private static void preconfig(int numAddressesLog, ParallelPipeline stmPipeline, PacketGenerator pkt) {
+		double preConfig = Math.pow(1<< numAddressesLog, 1.5);
+		
+		for (int i =0; i < preConfig; i++) {
+			stmPipeline.process(pkt.getConfigPacket());
+		}
+		
 	}
 }
 

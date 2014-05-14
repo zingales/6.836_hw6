@@ -250,10 +250,56 @@ class STMIntervalList {
 	}
 }
 
-
 class ParallelIntervalList {
+	
+	long[] addrs;
+	public ParallelIntervalList(int numAddressLog) {
+		addrs = new long[1<<numAddressLog];
+	}
+	
+	public boolean valid(int source) {
+		int index = source/64;
+		return ( (addrs[index] & (1<<source % 64))!=0);
+	}
+	
+	public void add(int begin, int end) {
+		int start_index, end_index;
+		start_index = begin/64;
+		end_index = end/64;
+		int bv = -(1<<begin%64), ev = 2;
+		if (start_index == end_index) {
+			addrs[start_index] |= (bv*ev);
+			return;
+		}
+		addrs[start_index] |= bv;
+		for(int i = start_index+1; i < end_index; i++) {
+			// min because its all ones
+			addrs[i] = Long.MIN_VALUE;
+		}
+		addrs[end_index] |= ev;
+	}
+	
+	public void remove(int begin, int end){
+		int start_index, end_index;
+		start_index = begin/64;
+		end_index = end/64;
+		int bv = (1<<begin%64)-1, ev = -(1<<end&64);
+		if(start_index == end_index) {
+			addrs[start_index] &= (bv | ev);
+			return;
+		}
+		addrs[start_index] &= bv;
+		for(int i = start_index+1; i < end_index; i++) {
+			// min because its all ones
+			addrs[i] = 0;
+		}
+		addrs[end_index] &= ev;
+	}
+}
+
+class ParallelIntervalList_gay {
 	ConcurrentSkipListMap<Integer, Node> list;
-	public ParallelIntervalList() {
+	public ParallelIntervalList_gay() {
 		list = new ConcurrentSkipListMap<Integer, Node>();
 	}
 
