@@ -30,7 +30,7 @@ class STMHistogram {
 		map = new HashMap<Long, Integer>();
 	}
 	
-	@Atomic
+//	@Atomic
 	public void add(long val) {
 		if(!map.containsKey(val)) {
 			map.put(val, 0);

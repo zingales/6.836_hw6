@@ -143,7 +143,7 @@ class STMIntervalList {
 		return false;
 	}
 
-	@Atomic
+//	@Atomic
 	public void add(int addressBegin, int addressEnd) {
 		Node n = new Node(addressBegin, addressEnd);
 		// check if this node is encapsulated
@@ -186,7 +186,7 @@ class STMIntervalList {
 		}
 	}
 
-	@Atomic
+//	@Atomic
 	public void remove(int start, int end) {
 		Entry<Integer, Node> e = list.floorEntry(start);
 		if (e!=null) {
