@@ -3,7 +3,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.deuce.Atomic;
 
 
 public class Histogram {
@@ -13,7 +12,7 @@ public class Histogram {
 		map = new HashMap<Long, Integer>();
 	}
 	
-	@Atomic
+//	@Atomic
 	public void add(long val) {
 		if(!map.containsKey(val)) {
 			map.put(val, 0);

@@ -1,7 +1,6 @@
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import org.deuce.Atomic;
 
 
 public class IntervalList {
