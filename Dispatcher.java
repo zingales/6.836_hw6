@@ -25,9 +25,11 @@ class Dispatcher implements Runnable {
 		while (!done.value) {
 			if(qArray.get(i).enq(tmp)) {
 				tmp = pkt.getPacket();
+        totalPackets++;
 			}
 			i = (i+1) % qArray.size();
 		}
+//    System.out.println("number packets" + totalPackets + " is that quick?");
 	}
 }
 

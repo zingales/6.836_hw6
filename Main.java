@@ -57,24 +57,119 @@ class SerialFirewall {
 			;
 		}
 		timer.stopTimer();
-		final long totalCount = workerData.dataPackets;
+		final long totalCount = dispatcher.totalPackets;
 		return new long[] { totalCount, timer.getElapsedTime() };
 	}
 
 	public static void main(String[] args) {
 
-		final int numSources = Integer.parseInt(args[0]);
-		final int numAddressesLog = 11;
-		final int numTrainsLog = 12;
-		final double meanTrainSize = 5.0;
-		final double meanTrainsPerComm = 1.0;
-		final int meanWindow = 3;
-		final int meanCommsPerAddress = 3;
-		final int meanWork = 3822;
-		final double configFraction = 0.24;
-		final double pngFraction = 0.04;
-		final double acceptingFraction = 0.96;
+		final int exp = Integer.parseInt(args[0]);
 		final int iters = 1;
+    int numSources = 1;
+		
+		int numAddressesLog;
+    int numTrainsLog = 12;
+    double meanTrainSize = 5.0;
+    double meanTrainsPerComm = 1.0;
+    int meanWindow = 3;
+    int meanCommsPerAddress = 3;
+    int meanWork = 3822;
+    double configFraction = 0.24;
+    double pngFraction = 0.04;
+    double acceptingFraction = 0.96;
+//		exp1
+		if(exp==1) {
+
+		  numAddressesLog = 11;
+	    numTrainsLog = 12;
+	    meanTrainSize = 5.0;
+	    meanTrainsPerComm = 1.0;
+	    meanWindow = 3;
+	    meanCommsPerAddress = 3;
+	    meanWork = 3822;
+	    configFraction = 0.24;
+	    pngFraction = 0.04;
+	    acceptingFraction = 0.96;
+		} else if (exp==2) {
+      numAddressesLog = 12;
+      numTrainsLog = 10;
+      meanTrainSize = 1.0;
+      meanTrainsPerComm = 3.0;
+      meanWindow = 3;
+      meanCommsPerAddress = 1;
+      meanWork = 2644;
+      configFraction = 0.11;
+      pngFraction = 0.09;
+      acceptingFraction = 0.92;		  
+		}else if (exp==3) {
+      numAddressesLog = 12;
+      numTrainsLog = 10;
+      meanTrainSize = 4.0;
+      meanTrainsPerComm = 3.0;
+      meanWindow = 6;
+      meanCommsPerAddress = 2;
+      meanWork = 1304;
+      configFraction = 0.10;
+      pngFraction = 0.03;
+      acceptingFraction = 0.90;
+    }else if (exp==4) {
+      numAddressesLog = 14;
+      numTrainsLog = 10;
+      meanTrainSize = 5.0;
+      meanTrainsPerComm = 5.0;
+      meanWindow = 6;
+      meanCommsPerAddress = 2;
+      meanWork = 315;
+      configFraction = 0.08;
+      pngFraction = 0.05;
+      acceptingFraction = 0.90;
+    }else if (exp==5) {
+      numAddressesLog = 15;
+      numTrainsLog = 14;
+      meanTrainSize = 9.0;
+      meanTrainsPerComm = 16.0;
+      meanWindow = 7;
+      meanCommsPerAddress = 10;
+      meanWork = 4007;
+      configFraction = 0.02;
+      pngFraction = 0.10;
+      acceptingFraction = 0.84;
+    }else if (exp==6) {
+      numAddressesLog = 15;
+      numTrainsLog = 15;
+      meanTrainSize = 9.0;
+      meanTrainsPerComm = 10.0;
+      meanWindow = 9;
+      meanCommsPerAddress = 10;
+      meanWork = 7125;
+      configFraction = 0.01;
+      pngFraction = 0.20;
+      acceptingFraction = 0.77;
+    }else if (exp==7) {
+      numAddressesLog = 15;
+      numTrainsLog = 15;
+      meanTrainSize = 10.0;
+      meanTrainsPerComm = 13.0;
+      meanWindow = 8;
+      meanCommsPerAddress = 10;
+      meanWork = 5328;
+      configFraction = 0.04;
+      pngFraction = 0.18;
+      acceptingFraction = 0.80;
+    }else {
+//      exp 8
+      numAddressesLog = 16;
+      numTrainsLog = 14;
+      meanTrainSize = 15.0;
+      meanTrainsPerComm = 12.0;
+      meanWindow = 9;
+      meanCommsPerAddress = 5;
+      meanWork = 8840;
+      configFraction = 0.04;
+      pngFraction = 0.19;
+      acceptingFraction = 0.76;
+    }
+	
 		
 		double throughput = 0;
 		for (int i = 0; i < iters; i++) {
@@ -247,9 +342,10 @@ class ParallelFirewall {
 			try { // which means that done.value is visible to the workers
 				workerThread[i].join();
 			} catch (InterruptedException ignore) {;}
-			totalCount += workerData[i].totalPackets;
+			//totalCount += workerData[i].totalPackets;
 			
 		}
+    totalCount = dispatcher.totalPackets;
 		timer.stopTimer();
 		return new long[] { totalCount, timer.getElapsedTime() };
 	}
@@ -258,7 +354,7 @@ class ParallelFirewall {
 
 	  final int exp = Integer.parseInt(args[0]);
 		final int numSources = Integer.parseInt(args[1]);
-		final int iters = 1;
+		final int iters = 4;
 		
 		//
 		int numAddressesLog;

@@ -27,17 +27,13 @@ class SerialPipeline implements Runnable {
 
   public void run() {
     Packet pkt;
-    // while(!done.value) {
-    // try {
-    // pkt = q.deq();
-    // process(pkt);
-    // }
-    // catch (EmptyException e) {
-    //
-    // }
-    //
-    // }
-
+    while (!done.value) {
+      pkt = q.deq();
+      if (pkt == null) {
+        continue;
+      }
+      process(pkt);
+    }
   }
 
   public void process(Packet pkt) {
