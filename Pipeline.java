@@ -181,6 +181,7 @@ class ParallelPipeline implements Runnable {
   // Map<Integer, ParallelIntervalList> r;
   ParallelIntervalList[]              r;
   ParallelHistogram                   hist;
+  Thread t;
 
   public ParallelPipeline(Set<Integer> png, ParallelIntervalList[] r,
       ParallelHistogram hist, int numAddressesLog,
@@ -190,7 +191,8 @@ class ParallelPipeline implements Runnable {
     this.totalPackets = 0;
     this.dataPackets = 0;
     this.fq = new LamportQueue<Packet>(100);
-    new Thread(new FingerPrinter(new Fingerprint(), fq, hist, done)).start();
+    t = new Thread(new FingerPrinter(new Fingerprint(), fq, hist, done));
+    t.start();
     this.r = r;
     this.hist = hist;
     this.png = png;
@@ -205,6 +207,9 @@ class ParallelPipeline implements Runnable {
       }
       process(pkt);
     }
+    try {
+      t.join();
+    } catch (InterruptedException e) {;}
 
   }
 
@@ -281,6 +286,7 @@ class FingerPrinter implements Runnable {
 			long fingerprint = fprint.getFingerprint(pkt.body.iterations, pkt.body.seed);
 			hist.add(fingerprint);
 		}
+
 
 	}
 	
