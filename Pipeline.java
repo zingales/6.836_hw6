@@ -190,7 +190,7 @@ class ParallelPipeline implements Runnable {
     this.q = q;
     this.totalPackets = 0;
     this.dataPackets = 0;
-    this.fq = new LamportQueue<Packet>(100);
+    this.fq = new LamportQueue<Packet>(5);
     t = new Thread(new FingerPrinter(new Fingerprint(), fq, hist, done));
     t.start();
     this.r = r;
